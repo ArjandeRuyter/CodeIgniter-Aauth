@@ -1,9 +1,9 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Aauth is a User Authorization Library for CodeIgniter 2.x, which aims to make 
- * easy some essential jobs such as login, permissions and access operations. 
- * Despite ease of use, it has also very advanced features like private messages, 
+ * Aauth is a User Authorization Library for CodeIgniter 2.x, which aims to make
+ * easy some essential jobs such as login, permissions and access operations.
+ * Despite ease of use, it has also very advanced features like private messages,
  * groupping, access management, public access etc..
  *
  * @author		Emre Akay <emreakayfb@hotmail.com>
@@ -52,7 +52,7 @@ class Aauth {
 	 * @var array
 	 */
 	public $infos = array();
-	
+
 	/**
 	 * Local temporary storage for current flash errors
 	 *
@@ -108,8 +108,8 @@ class Aauth {
 		$this->CI->config->load('aauth');
 		$this->config_vars = $this->CI->config->item('aauth');
 
-		$this->aauth_db = $this->CI->load->database($this->config_vars['db_profile'], TRUE); 
-		
+		$this->aauth_db = $this->CI->load->database($this->config_vars['db_profile'], TRUE);
+
 		// load error and info messages from flashdata (but don't store back in flashdata)
 		$this->errors = $this->CI->session->flashdata('errors') ?: array();
 		$this->infos = $this->CI->session->flashdata('infos') ?: array();
@@ -214,12 +214,12 @@ class Aauth {
 		// to find user id, create sessions and cookies
 		$query = $this->aauth_db->where($db_identifier, $identifier);
 		$query = $this->aauth_db->get($this->config_vars['users']);
-		
+
 		if($query->num_rows() == 0){
 			$this->error($this->CI->lang->line('aauth_error_no_user'));
 			return FALSE;
 		}
-		
+
 		$user_id = $query->row()->id;
 		if($this->config_vars['recaptcha_active']){
 			if( ($this->config_vars['use_cookies'] == TRUE && $this->CI->input->cookie('reCAPTCHA', TRUE) == 'true') || ($this->config_vars['use_cookies'] == FALSE && $this->CI->session->tempdata('reCAPTCHA') == 'true') ){
@@ -232,7 +232,7 @@ class Aauth {
 				}
 			}
 		}
-	 	
+
 	 	if($this->config_vars['totp_active'] == TRUE AND $this->config_vars['totp_only_on_ip_change'] == FALSE){
 			$query = null;
 			$query = $this->aauth_db->where($db_identifier, $identifier);
@@ -252,7 +252,7 @@ class Aauth {
 				}
 			}
 	 	}
-	 	
+
 	 	if($this->config_vars['totp_active'] == TRUE AND $this->config_vars['totp_only_on_ip_change'] == TRUE){
 			$query = null;
 			$query = $this->aauth_db->where($db_identifier, $identifier);
@@ -278,7 +278,7 @@ class Aauth {
 				}
 			}
 	 	}
-	 	
+
 		$query = null;
 		$query = $this->aauth_db->where($db_identifier, $identifier);
 
@@ -339,12 +339,12 @@ class Aauth {
 					$this->CI->session->unset_tempdata('reCAPTCHA');
 				}
 			}
-			
+
 			// update last login
 			$this->update_last_login($row->id);
 			$this->update_activity();
 			$this->reset_login_attempts($row->id);
-			
+
 			return TRUE;
 		}
 		// if not matches
@@ -434,7 +434,7 @@ class Aauth {
 
 	/**
 	 * Controls if a logged or public user has permission
-	 * 
+	 *
 	 * If user does not have permission to access page, it stops script and gives
 	 * error message, unless 'no_permission' value is set in config.  If 'no_permission' is
 	 * set in config it redirects user to the set url and passes the 'no_access' error message.
@@ -477,7 +477,7 @@ class Aauth {
 			);
 			$this->CI->input->set_cookie($cookie);
 		}
-		
+
 		return $this->CI->session->sess_destroy();
 	}
 
@@ -552,7 +552,7 @@ class Aauth {
 			$this->CI->email->subject($this->CI->lang->line('aauth_email_reset_subject'));
 			$this->CI->email->message($this->CI->lang->line('aauth_email_reset_text') . site_url() . $this->config_vars['reset_password_link'] . $row->id . '/' . $ver_code );
 			$this->CI->email->send();
-			
+
 			return TRUE;
 		}
 		return FALSE;
@@ -583,7 +583,7 @@ class Aauth {
 		 	if($this->config_vars['totp_active'] == TRUE AND $this->config_vars['totp_reset_over_reset_password'] == TRUE){
 		 		$data['totp_secret'] = NULL;
 		 	}
-		 	
+
 			$row = $query->row();
 			$email = $row->email;
 
@@ -667,9 +667,9 @@ class Aauth {
 	/**
 	 * Update remember
 	 * Update amount of time a user is remembered for
-	 * @param int $user_id User id to update 
+	 * @param int $user_id User id to update
 	 * @param int $expression
-	 * @param int $expire 
+	 * @param int $expire
 	 * @return bool Update fails/succeeds
 	 */
 	public function update_remember($user_id, $expression=null, $expire=null) {
@@ -727,7 +727,7 @@ class Aauth {
 			$valid = FALSE;
 		}
 		if (!$valid) {
-			return FALSE; 
+			return FALSE;
 		}
 
 		$data = array(
@@ -817,7 +817,7 @@ class Aauth {
 		}
 
 		if (!$valid) {
-			return FALSE; 
+			return FALSE;
 		}
 
 		$this->aauth_db->where('id', $user_id);
@@ -834,7 +834,7 @@ class Aauth {
 	 * @param bool $include_banneds Include banned users
 	 * @return array Array of users
 	 */
-	public function list_users($group_par = FALSE, $limit = FALSE, $offset = FALSE, $include_banneds = FALSE) {
+	public function list_users($group_par = FALSE, $limit = FALSE, $offset = FALSE, $include_banneds = FALSE, $order=FALSE , $direction = 'ASC') {
 
 		// if group_par is given
 		if ($group_par != FALSE) {
@@ -864,6 +864,11 @@ class Aauth {
 				$this->aauth_db->limit($limit);
 			else
 				$this->aauth_db->limit($limit, $offset);
+		}
+
+		// order
+		if($order){
+			$this->aauth_db->order_by( $order , $direction );
 		}
 
 		$query = $this->aauth_db->get();
@@ -1213,7 +1218,7 @@ class Aauth {
 	public function delete_group($group_par) {
 
 		$group_id = $this->get_group_id($group_par);
-		
+
 		$this->aauth_db->where('id',$group_id);
 		$query = $this->aauth_db->get($this->config_vars['groups']);
 		if ($query->num_rows() == 0){
@@ -1224,7 +1229,7 @@ class Aauth {
 		// now users are deleted from user_to_group table
 		$this->aauth_db->where('group_id', $group_id);
 		$this->aauth_db->delete($this->config_vars['user_to_group']);
-		
+
 		$this->aauth_db->where('group_id', $group_id);
 		$this->aauth_db->delete($this->config_vars['perm_to_group']);
 
@@ -1330,7 +1335,11 @@ class Aauth {
 	 * List all groups
 	 * @return object Array of groups
 	 */
-	public function list_groups() {
+	 public function list_groups($order=FALSE , $direction = 'ASC') {
+		 // order
+		 if($order){
+			 $this->aauth_db->order_by( $order , $direction );
+		 }
 
 		$query = $this->aauth_db->get($this->config_vars['groups']);
 		return $query->result();
@@ -1473,7 +1482,7 @@ class Aauth {
 		}
 
 		$perm_id = $this->get_perm_id($perm_par);
-		
+
 		$query = $this->aauth_db->where('perm_id', $perm_id);
 		$query = $this->aauth_db->where('user_id', $user_id);
 		$query = $this->aauth_db->get( $this->config_vars['perm_to_user'] );
@@ -1785,7 +1794,7 @@ class Aauth {
 	 * @return bool Delete success/failure
 	 */
 	public function delete_pm($pm_id){
-		
+
 		return $this->aauth_db->delete( $this->config_vars['pms'], array('id' => $pm_id) );
 	}
 
@@ -1879,7 +1888,7 @@ class Aauth {
 
 	/**
 	 * Print Errors
-	 * 
+	 *
 	 * Prints string of errors separated by delimiter
 	 * @param string $divider Separator for errors
 	 */
@@ -1900,10 +1909,10 @@ class Aauth {
 		}
 		echo $msg;
 	}
-	
+
 	/**
 	 * Clear Errors
-	 * 
+	 *
 	 * Removes errors from error list and clears all associated flashdata
 	 */
 	public function clear_errors()
@@ -1916,7 +1925,7 @@ class Aauth {
 	 * Info
 	 *
 	 * Add message to info array and set flash data
-	 * 
+	 *
 	 * @param string $message Message to add to infos array
 	 * @param boolean $flashdata if TRUE add $message to CI flashdata (deflault: FALSE)
 	 */
@@ -1990,10 +1999,10 @@ class Aauth {
 		}
 		echo $msg;
 	}
-	
+
 	/**
 	 * Clear Info List
-	 * 
+	 *
 	 * Removes info messages from info list and clears all associated flashdata
 	 */
 	public function clear_infos()
@@ -2112,8 +2121,8 @@ class Aauth {
 		}
 
 	}
-	
-   
+
+
 	/**
 	 * List User Variable Keys by UserID
 	 * Return array of variable keys or FALSE
@@ -2218,7 +2227,7 @@ class Aauth {
 			return $row->value;
 		}
 	}
-	
+
 	 /**
 	 * List System Variable Keys
 	 * Return array of variable keys or FALSE
